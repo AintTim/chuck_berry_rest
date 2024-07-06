@@ -1,0 +1,72 @@
+[
+  {
+    "id": 1,
+    "name": "John",
+    "surname": "Doe",
+    "birthDate": "13/02/1995",
+    "phoneNumber": "79998887766"
+  },
+  {
+    "id": 2,
+    "name": "Jane",
+    "surname": "Doe",
+    "birthDate": "26/08/1997",
+    "phoneNumber": "79008007060"
+  },
+  {
+    "id": 3,
+    "name": "Rocco",
+    "surname": "Wilson",
+    "birthDate": "14/08/1990",
+    "phoneNumber": "79218757848"
+  },
+  {
+    "id": 4,
+    "name": "Christine",
+    "surname": "Franco",
+    "birthDate": "10/08/1987",
+    "phoneNumber": "79218757848"
+  },
+  {
+    "id": 5,
+    "name": "Grace",
+    "surname": "Conner",
+    "birthDate": "05/05/1995",
+    "phoneNumber": "79900137449"
+  },
+  {
+    "id": 6,
+    "name": "Paul",
+    "surname": "Terry",
+    "birthDate": "15/11/1990",
+    "phoneNumber": "78420209845"
+  },
+  {
+    "id": 7,
+    "name": "Lisa",
+    "surname": "Phillips",
+    "birthDate": "27/12/2002",
+    "phoneNumber": "78622719192"
+  },
+  {
+    "id": 8,
+    "name": "Bella",
+    "surname": "Murray",
+    "birthDate": "25/11/1999",
+    "phoneNumber": "78614173499"
+  },
+  {
+    "id": 9,
+    "name": "Cole",
+    "surname": "Montes",
+    "birthDate": "04/07/1978",
+    "phoneNumber": "79091922157"
+  },
+  {
+    "id": 10,
+    "name": "Dale",
+    "surname": "May",
+    "birthDate": "07/07/2007",
+    "phoneNumber": "77777777777"
+  }
+]

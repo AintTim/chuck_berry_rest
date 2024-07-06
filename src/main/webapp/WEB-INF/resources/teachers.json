@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "name": "Anton",
+    "experience": 3,
+    "subjects": ["MATH", "MUSIC", "GEOGRAPHY"]
+  },
+  {
+    "id": 2,
+    "name": "Zakariya",
+    "experience": 7,
+    "subjects": ["ART", "MUSIC", "SOCIAL_STUDIES"]
+  },
+  {
+    "id": 3,
+    "name": "Amanda",
+    "experience": 1,
+    "subjects": ["PHYSICAL_EDUCATION"]
+  },
+  {
+    "id": 4,
+    "name": "Lawrence",
+    "experience": 15,
+    "subjects": ["HISTORY", "SOCIAL_STUDIES"]
+  },
+  {
+    "id": 5,
+    "name": "Louis",
+    "experience": 2,
+    "subjects": ["GEOGRAPHY", "HISTORY", "ART"]
+  }
+]
