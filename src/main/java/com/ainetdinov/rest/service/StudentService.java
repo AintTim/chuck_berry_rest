@@ -11,17 +11,16 @@ import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-@Getter
 public class StudentService {
-    private static final String STUDENTS_PATH = "students.path";
     private final ParsingService parser;
     private final ValidatorService<Student> validator;
+    @Getter
     private final List<Student> students;
 
     public StudentService(Path studentsPath, ParsingService parser, ValidatorService<Student> validator) {
         this.validator = validator;
         this.parser = parser;
-        students = parser.parse(studentsPath, Student.class);
+        students = parser.parseList(studentsPath, Student.class);
     }
 
     public Student getStudent(int id) {
