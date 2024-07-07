@@ -12,6 +12,10 @@ repositories {
 
 ext {
     junitVersion = '5.10.0'
+    lombokVersion = '1.18.34'
+    jakartaVersion = '6.0.0'
+    jacksonVersion = '2.17.1'
+    apacheVersion = '3.14.0'
 }
 
 sourceCompatibility = '11'
@@ -22,10 +26,20 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 dependencies {
-    compileOnly('jakarta.servlet:jakarta.servlet-api:6.0.0')
+    implementation "jakarta.servlet:jakarta.servlet-api:${jakartaVersion}"
+    implementation "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
+    implementation "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+    implementation "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}"
+    implementation "org.apache.commons:commons-lang3:${apacheVersion}"
+
+
+
+    implementation "org.projectlombok:lombok:${lombokVersion}"
+    annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+
 }
 
 test {
