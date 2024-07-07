@@ -1,14 +1,11 @@
 package com.ainetdinov.rest.servlet;
 
-import static com.ainetdinov.rest.constant.Endpoint.*;
-
-import com.ainetdinov.rest.constant.Attributes;
+import com.ainetdinov.rest.constant.WebConstants;
 import com.ainetdinov.rest.model.Group;
 import com.ainetdinov.rest.service.GroupsService;
 import com.ainetdinov.rest.service.HttpService;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletContext;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,23 +16,25 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 
+import static com.ainetdinov.rest.constant.Endpoint.*;
+
 @WebServlet(SLASH + GROUPS + SLASH + ASTERISK)
 public class GroupServlet extends HttpServlet {
     private GroupsService groupsService;
     private HttpService httpService;
 
     @Override
-    public void init(ServletConfig config) throws ServletException {
+    public void init(ServletConfig config) {
         ServletContext context = config.getServletContext();
-        groupsService = (GroupsService) context.getAttribute(Attributes.GROUP_SERVICE);
-        httpService = (HttpService) context.getAttribute(Attributes.HTTP_SERVICE);
+        groupsService = (GroupsService) context.getAttribute(WebConstants.GROUP_SERVICE);
+        httpService = (HttpService) context.getAttribute(WebConstants.HTTP_SERVICE);
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         httpService.prepareResponse(resp);
         if (httpService.containsQueryString(req)) {
-            if (Objects.nonNull(req.getParameter("number"))) {
+            if (Objects.nonNull(req.getParameter(WebConstants.NUMBER))) {
                 getGroupByNumber(req, resp);
             } else {
                 getGroupsByStudentSurname(req, resp);
@@ -46,8 +45,19 @@ public class GroupServlet extends HttpServlet {
         }
     }
 
-    private void getGroupByNumber(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String number = req.getParameter("number");
+    @Override
+    public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        httpService.prepareResponse(resp);
+        String body = httpService.getRequestBody(req);
+        if (groupsService.addGroup(body)) {
+            resp.setStatus(HttpServletResponse.SC_CREATED);
+        } else {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        }
+    }
+
+    private void getGroupByNumber(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String number = req.getParameter(WebConstants.NUMBER);
         List<Group> groups = groupsService.getGroups(g -> g.getNumber().equals(number));
         if (groups.isEmpty()) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -57,10 +67,10 @@ public class GroupServlet extends HttpServlet {
         }
     }
 
-    private void getGroupsByStudentSurname(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String studentSurname = req.getParameter("surname");
+    private void getGroupsByStudentSurname(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String studentSurname = req.getParameter(WebConstants.SURNAME);
         Predicate<Group> isStudentPresent = g -> g.getStudents().stream()
-                .allMatch(student -> student.getSurname().equals(studentSurname));
+                .anyMatch(student -> student.getSurname().equalsIgnoreCase(studentSurname));
         List<Group> groups = groupsService.getGroups(isStudentPresent);
         if (groups.isEmpty()) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
