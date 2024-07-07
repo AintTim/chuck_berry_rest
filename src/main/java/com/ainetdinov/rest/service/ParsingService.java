@@ -27,7 +27,7 @@ public class ParsingService {
         mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
     }
 
-    public <T> List<T> parse(Path jsonPath, Class<T> clazz) {
+    public <T> List<T> parseList(Path jsonPath, Class<T> clazz) {
         try {
             CollectionType returnType = mapper.getTypeFactory().constructCollectionType(List.class, clazz);
             if (Files.exists(jsonPath)) {
