@@ -1,9 +1,7 @@
 package com.ainetdinov.rest.listener;
 
 import com.ainetdinov.rest.constant.Attributes;
-import com.ainetdinov.rest.service.ParsingService;
-import com.ainetdinov.rest.service.StudentService;
-import com.ainetdinov.rest.service.StudentValidator;
+import com.ainetdinov.rest.service.*;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletContextEvent;
 import jakarta.servlet.ServletContextListener;
@@ -26,8 +24,10 @@ public class AppContextListener implements ServletContextListener {
         initProperties(context);
 
         StudentService studentService = new StudentService(getResourcePath(context, "students.path"), new ParsingService(), new StudentValidator());
+        TeacherService teacherService = new TeacherService(getResourcePath(context, "teachers.path"), new ParsingService(), new TeacherValidator());
 
         context.setAttribute(Attributes.STUDENT_SERVICE, studentService);
+        context.setAttribute(Attributes.TEACHER_SERVICE, teacherService);
 
         ServletContextListener.super.contextInitialized(sce);
     }
