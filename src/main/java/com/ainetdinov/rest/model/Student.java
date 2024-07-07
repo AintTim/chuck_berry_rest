@@ -1,6 +1,7 @@
 package com.ainetdinov.rest.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.jackson.Jacksonized;
@@ -12,6 +13,7 @@ import java.time.LocalDate;
 @Data
 @Builder
 @Jacksonized
+@JsonInclude(JsonInclude.Include.NON_ABSENT)
 public class Student {
     private Long id;
     private String name;
