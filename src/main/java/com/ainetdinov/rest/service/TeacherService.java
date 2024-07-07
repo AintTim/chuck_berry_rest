@@ -9,27 +9,23 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 
-public class TeacherService {
-    private final ParsingService parser;
-    private final ValidatorService<Teacher> validator;
-    @Getter
+@Getter
+public class TeacherService extends EntityService<Teacher> {
     private final List<Teacher> teachers;
 
     public TeacherService(Path teachersPath, ParsingService parser, ValidatorService<Teacher> validator) {
-        this.validator = validator;
-        this.parser = parser;
-        teachers = parser.parseList(teachersPath, Teacher.class);
+        super(parser, validator);
+        teachers = initEntities(teachersPath);
     }
 
     public boolean addTeacher(String jsonBody) {
         Teacher teacher = parser.parse(jsonBody, new TypeReference<>() {
         });
         synchronized (teachers) {
-            if (validateTeacher(teacher, Objects::nonNull, this::isUniqueTeacher, validator::validate)) {
+            if (validateEntity(teacher, Objects::nonNull, this::isUniqueTeacher, validator::validate)) {
                 teachers.add(teacher);
                 return true;
             } else {
@@ -62,12 +58,12 @@ public class TeacherService {
         }
     }
 
-    @SafeVarargs
-    private boolean validateTeacher(Teacher teacher, Predicate<Teacher>... filters) {
-        return Arrays.stream(filters).allMatch(filter -> filter.test(teacher));
-    }
-
     private boolean isUniqueTeacher(Teacher teacher) {
         return teachers.stream().noneMatch(t -> Objects.equals(t.getId(), teacher.getId()));
+    }
+
+    @Override
+    protected List<Teacher> initEntities(Path path) {
+        return parser.parseList(path, Teacher.class);
     }
 }

@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import com.ainetdinov.rest.constant.Attributes;
 import com.ainetdinov.rest.model.Student;
+import com.ainetdinov.rest.service.HttpService;
 import com.ainetdinov.rest.service.StudentService;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletContext;
@@ -17,19 +18,21 @@ import jakarta.servlet.annotation.*;
 @WebServlet(SLASH + STUDENTS + SLASH + ASTERISK)
 public class StudentServlet extends HttpServlet {
     private StudentService studentService;
+    private HttpService httpService;
 
     @Override
     public void init(ServletConfig config) {
         ServletContext context = config.getServletContext();
         studentService = (StudentService) context.getAttribute(Attributes.STUDENT_SERVICE);
+        httpService = (HttpService) context.getAttribute(Attributes.HTTP_SERVICE);
     }
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        prepareResponse(response);
-        if (containsPath(request)) {
+        httpService.prepareResponse(response);
+        if (httpService.containsPath(request)) {
             getStudentById(request, response);
-        } else if (containsQueryString(request)) {
+        } else if (httpService.containsQueryString(request)) {
             getStudentsBySurname(request, response);
         } else {
             response.getWriter().write(studentService.getStudents().toString());
@@ -39,7 +42,7 @@ public class StudentServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        prepareResponse(resp);
+        httpService.prepareResponse(resp);
         String body = req.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
         if (studentService.addStudent(body)) {
             resp.setStatus(HttpServletResponse.SC_CREATED);
@@ -50,9 +53,9 @@ public class StudentServlet extends HttpServlet {
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        prepareResponse(resp);
-        if (containsPath(req)) {
-            if (studentService.deleteStudent(extractId(req))) {
+        httpService.prepareResponse(resp);
+        if (httpService.containsPath(req)) {
+            if (studentService.deleteStudent(httpService.extractId(req))) {
                 resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
             } else {
                 resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -64,10 +67,10 @@ public class StudentServlet extends HttpServlet {
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        prepareResponse(resp);
-        if (containsPath(req)) {
+        httpService.prepareResponse(resp);
+        if (httpService.containsPath(req)) {
             String requestBody = req.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-            Student updatesStudent = studentService.updateStudent(requestBody, extractId(req));
+            Student updatesStudent = studentService.updateStudent(requestBody, httpService.extractId(req));
             if (Objects.nonNull(updatesStudent)) {
                 resp.getWriter().write(updatesStudent.toString());
                 resp.setStatus(HttpServletResponse.SC_OK);
@@ -77,24 +80,8 @@ public class StudentServlet extends HttpServlet {
         }
     }
 
-    private void prepareResponse(HttpServletResponse response) {
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        response.setHeader("Content-Type", "application/json");
-    }
-
-    private boolean containsPath(HttpServletRequest request) {
-        String path = request.getPathInfo();
-        return Objects.nonNull(path) && !path.replace(SLASH, "").isEmpty();
-    }
-
-    private boolean containsQueryString(HttpServletRequest request) {
-        String queryString = request.getQueryString();
-        return Objects.nonNull(queryString) && !queryString.isEmpty();
-    }
-
     private void getStudentById(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        Student student = studentService.getStudent(extractId(request));
+        Student student = studentService.getStudent(httpService.extractId(request));
         if (Objects.nonNull(student)) {
             response.getWriter().write(student.toString());
             response.setStatus(HttpServletResponse.SC_OK);
@@ -112,10 +99,6 @@ public class StudentServlet extends HttpServlet {
             response.getWriter().write(students.toString());
             response.setStatus(HttpServletResponse.SC_OK);
         }
-    }
-
-    private int extractId(HttpServletRequest request) {
-        return Integer.parseInt(request.getPathInfo().replace(SLASH, ""));
     }
 
     public void destroy() {
