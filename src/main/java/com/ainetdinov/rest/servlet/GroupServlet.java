@@ -49,7 +49,10 @@ public class GroupServlet extends HttpServlet {
     public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         httpService.prepareResponse(resp);
         String body = httpService.getRequestBody(req);
-        if (groupsService.addGroup(body)) {
+        if (httpService.containsPath(req)) {
+            groupsService.addStudentsToGroup(body, httpService.extractId(req));
+            resp.setStatus(HttpServletResponse.SC_CREATED);
+        } else if (groupsService.addGroup(body)) {
             resp.setStatus(HttpServletResponse.SC_CREATED);
         } else {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);

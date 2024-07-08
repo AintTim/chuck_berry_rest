@@ -28,7 +28,7 @@ public class AppContextListener implements ServletContextListener {
 
         StudentService studentService = new StudentService(getResourcePath(context, "students.path"), new ParsingService(), new StudentValidator());
         TeacherService teacherService = new TeacherService(getResourcePath(context, "teachers.path"), new ParsingService(), new TeacherValidator());
-        GroupsService groupsService = new GroupsService(getResourcePath(context, "groups.path"), new ParsingService(), new GroupValidator());
+        GroupsService groupsService = new GroupsService(getResourcePath(context, "groups.path"), new ParsingService(), new GroupValidator(), new StudentValidator());
 
         context.setAttribute(WebConstants.STUDENT_SERVICE, studentService);
         context.setAttribute(WebConstants.TEACHER_SERVICE, teacherService);

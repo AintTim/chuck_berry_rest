@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.extern.jackson.Jacksonized;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -14,6 +15,7 @@ import java.time.LocalDate;
 @Builder
 @Jacksonized
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
+@EqualsAndHashCode
 public class Student {
     private Long id;
     private String name;
