@@ -1,8 +1,8 @@
-package com.ainetdinov.rest.service;
+package com.ainetdinov.rest.validator;
 
 import com.ainetdinov.rest.model.Student;
+import com.ainetdinov.rest.service.ValidatorService;
 
-import java.util.Objects;
 import java.util.regex.Pattern;
 
 public class StudentValidator implements ValidatorService<Student> {

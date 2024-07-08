@@ -1,19 +1,22 @@
 package com.ainetdinov.rest.servlet;
 
-import static com.ainetdinov.rest.constant.Endpoint.*;
-import java.io.*;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import com.ainetdinov.rest.constant.Attributes;
+import com.ainetdinov.rest.constant.WebConstants;
 import com.ainetdinov.rest.model.Student;
 import com.ainetdinov.rest.service.HttpService;
 import com.ainetdinov.rest.service.StudentService;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletContext;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.*;
-import jakarta.servlet.annotation.*;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import static com.ainetdinov.rest.constant.Endpoint.*;
 
 @WebServlet(SLASH + STUDENTS + SLASH + ASTERISK)
 public class StudentServlet extends HttpServlet {
@@ -23,8 +26,8 @@ public class StudentServlet extends HttpServlet {
     @Override
     public void init(ServletConfig config) {
         ServletContext context = config.getServletContext();
-        studentService = (StudentService) context.getAttribute(Attributes.STUDENT_SERVICE);
-        httpService = (HttpService) context.getAttribute(Attributes.HTTP_SERVICE);
+        studentService = (StudentService) context.getAttribute(WebConstants.STUDENT_SERVICE);
+        httpService = (HttpService) context.getAttribute(WebConstants.HTTP_SERVICE);
     }
 
     @Override
@@ -41,7 +44,7 @@ public class StudentServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         httpService.prepareResponse(resp);
         String body = req.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
         if (studentService.addStudent(body)) {
@@ -52,7 +55,7 @@ public class StudentServlet extends HttpServlet {
     }
 
     @Override
-    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    public void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         httpService.prepareResponse(resp);
         if (httpService.containsPath(req)) {
             if (studentService.deleteStudent(httpService.extractId(req))) {
@@ -66,10 +69,10 @@ public class StudentServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         httpService.prepareResponse(resp);
         if (httpService.containsPath(req)) {
-            String requestBody = req.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+            String requestBody = httpService.getRequestBody(req);
             Student updatesStudent = studentService.updateStudent(requestBody, httpService.extractId(req));
             if (Objects.nonNull(updatesStudent)) {
                 resp.getWriter().write(updatesStudent.toString());
@@ -91,7 +94,7 @@ public class StudentServlet extends HttpServlet {
     }
 
     private void getStudentsBySurname(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String surname = request.getParameter("surname");
+        String surname = request.getParameter(WebConstants.SURNAME);
         List<Student> students = studentService.getStudents(s -> s.getSurname().equals(surname));
         if (students.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);

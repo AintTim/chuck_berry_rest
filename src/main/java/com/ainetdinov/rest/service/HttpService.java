@@ -3,7 +3,9 @@ package com.ainetdinov.rest.service;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import java.io.IOException;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static com.ainetdinov.rest.constant.Endpoint.SLASH;
 
@@ -28,5 +30,9 @@ public class HttpService {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.setHeader("Content-Type", "application/json");
+    }
+
+    public String getRequestBody(HttpServletRequest request) throws IOException {
+        return request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
     }
 }
