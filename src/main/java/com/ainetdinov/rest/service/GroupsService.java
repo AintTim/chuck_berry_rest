@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.Getter;
 
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
@@ -14,11 +15,11 @@ import java.util.stream.Collectors;
 @Getter
 public class GroupsService extends EntityService<Group> {
     private final List<Group> groups;
-    private final ValidatorService<Student> studentValidator;
+    private final StudentService studentService;
 
-    public GroupsService(Path groupsPath, ParsingService parser, ValidatorService<Group> validator, ValidatorService<Student> studentValidator) {
+    public GroupsService(Path groupsPath, ParsingService parser, ValidatorService<Group> validator, StudentService studentService) {
         super(parser, validator);
-        this.studentValidator = studentValidator;
+        this.studentService = studentService;
         groups = initEntities(groupsPath);
     }
 
@@ -31,7 +32,7 @@ public class GroupsService extends EntityService<Group> {
     public boolean addGroup(String jsonBody) {
         Group group = parser.parse(jsonBody, new TypeReference<>(){});
         synchronized (groups) {
-            if (validateEntity(group, Objects::nonNull, this::isUniqueGroup, validator::validate) && validateGroupStudents(group)) {
+            if (validateEntity(group, Objects::nonNull, this::isUnique, validator::validate) && validateStudentsPresence(group.getStudents())) {
                 groups.add(group);
                 return true;
             } else {
@@ -44,11 +45,11 @@ public class GroupsService extends EntityService<Group> {
         List<Student> students = parser.parse(jsonBody, new TypeReference<>(){});
         Group group = getGroupById(groupId);
         synchronized (groups) {
-            students.forEach(student -> {
-                if (studentValidator.validate(student) && isUniqueStudent(student, group)) {
-                    group.getStudents().add(student);
-                }
-            });
+            if (validateStudentsPresence(students)) {
+                students.stream()
+                        .filter(s -> isUniqueStudent(s, group))
+                        .forEach(group.getStudents()::add);
+            }
         }
     }
 
@@ -59,20 +60,21 @@ public class GroupsService extends EntityService<Group> {
                 .orElse(null);
     }
 
-    private boolean isUniqueStudent(Student student, Group group) {
-        return !group.getStudents().contains(student);
-    }
-
-    private boolean isUniqueGroup(Group group) {
-        return groups.stream().noneMatch(g -> g.getNumber().equalsIgnoreCase(group.getNumber()));
-    }
-
     @Override
     protected List<Group> initEntities(Path path) {
         return parser.parseList(path, Group.class);
     }
 
-    private boolean validateGroupStudents(Group group) {
-        return group.getStudents().stream().allMatch(studentValidator::validate);
+    @Override
+    protected boolean isUnique(Group entity) {
+        return !groups.contains(entity);
+    }
+
+    private boolean isUniqueStudent(Student student, Group group) {
+        return !group.getStudents().contains(student);
+    }
+
+    private boolean validateStudentsPresence(List<Student> students) {
+        return new HashSet<>(studentService.getStudents()).containsAll(students);
     }
 }

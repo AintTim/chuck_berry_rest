@@ -49,7 +49,7 @@ public class StudentService extends EntityService<Student> {
     public boolean addStudent(String jsonBody) {
         Student student = parser.parse(jsonBody, new TypeReference<>(){});
         synchronized (students) {
-            if (validateEntity(student, Objects::nonNull, this::isUniqueStudent, validator::validate)) {
+            if (validateEntity(student, Objects::nonNull, this::isUnique, validator::validate)) {
                 students.add(student);
                 return true;
             } else {
@@ -64,12 +64,13 @@ public class StudentService extends EntityService<Student> {
         }
     }
 
-    private boolean isUniqueStudent(Student student) {
-        return students.stream().noneMatch(s -> Objects.equals(s.getId(), student.getId()));
-    }
-
     @Override
     protected List<Student> initEntities(Path path) {
         return parser.parseList(path, Student.class);
+    }
+
+    @Override
+    protected boolean isUnique(Student entity) {
+        return !students.contains(entity);
     }
 }

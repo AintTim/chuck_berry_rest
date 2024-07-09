@@ -3,6 +3,7 @@ package com.ainetdinov.rest.listener;
 import com.ainetdinov.rest.constant.WebConstants;
 import com.ainetdinov.rest.service.*;
 import com.ainetdinov.rest.validator.GroupValidator;
+import com.ainetdinov.rest.validator.ScheduleValidator;
 import com.ainetdinov.rest.validator.StudentValidator;
 import com.ainetdinov.rest.validator.TeacherValidator;
 import jakarta.servlet.ServletContext;
@@ -28,11 +29,13 @@ public class AppContextListener implements ServletContextListener {
 
         StudentService studentService = new StudentService(getResourcePath(context, "students.path"), new ParsingService(), new StudentValidator());
         TeacherService teacherService = new TeacherService(getResourcePath(context, "teachers.path"), new ParsingService(), new TeacherValidator());
-        GroupsService groupsService = new GroupsService(getResourcePath(context, "groups.path"), new ParsingService(), new GroupValidator(), new StudentValidator());
+        GroupsService groupsService = new GroupsService(getResourcePath(context, "groups.path"), new ParsingService(), new GroupValidator(), studentService);
+        ScheduleService scheduleService = new ScheduleService(getResourcePath(context, "schedules.path"), new ParsingService(), new ScheduleValidator(), teacherService, groupsService);
 
         context.setAttribute(WebConstants.STUDENT_SERVICE, studentService);
         context.setAttribute(WebConstants.TEACHER_SERVICE, teacherService);
         context.setAttribute(WebConstants.GROUP_SERVICE, groupsService);
+        context.setAttribute(WebConstants.SCHEDULE_SERVICE, scheduleService);
         context.setAttribute(WebConstants.HTTP_SERVICE, new HttpService());
 
         ServletContextListener.super.contextInitialized(sce);

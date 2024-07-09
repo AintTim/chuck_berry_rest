@@ -25,7 +25,7 @@ public class TeacherService extends EntityService<Teacher> {
         Teacher teacher = parser.parse(jsonBody, new TypeReference<>() {
         });
         synchronized (teachers) {
-            if (validateEntity(teacher, Objects::nonNull, this::isUniqueTeacher, validator::validate)) {
+            if (validateEntity(teacher, Objects::nonNull, this::isUnique, validator::validate)) {
                 teachers.add(teacher);
                 return true;
             } else {
@@ -58,12 +58,13 @@ public class TeacherService extends EntityService<Teacher> {
         }
     }
 
-    private boolean isUniqueTeacher(Teacher teacher) {
-        return teachers.stream().noneMatch(t -> Objects.equals(t.getId(), teacher.getId()));
-    }
-
     @Override
     protected List<Teacher> initEntities(Path path) {
         return parser.parseList(path, Teacher.class);
+    }
+
+    @Override
+    protected boolean isUnique(Teacher entity) {
+        return !teachers.contains(entity);
     }
 }

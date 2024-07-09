@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @Builder
 @Jacksonized
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude = {"id"})
 public class Student {
     private Long id;
     private String name;

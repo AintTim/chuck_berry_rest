@@ -4,6 +4,7 @@ import com.ainetdinov.rest.constant.Subject;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.extern.jackson.Jacksonized;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
@@ -14,6 +15,7 @@ import java.util.List;
 @Builder
 @Jacksonized
 @JsonInclude(JsonInclude.Include.NON_ABSENT)
+@EqualsAndHashCode(exclude = {"id"})
 public class Teacher {
     private Long id;
     private String name;
