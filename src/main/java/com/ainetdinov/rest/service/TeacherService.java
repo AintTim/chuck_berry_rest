@@ -2,31 +2,23 @@ package com.ainetdinov.rest.service;
 
 import com.ainetdinov.rest.constant.Subject;
 import com.ainetdinov.rest.model.Teacher;
-import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.Getter;
 
-import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 
 @Getter
 public class TeacherService extends EntityService<Teacher> {
-    private final List<Teacher> teachers;
 
-    public TeacherService(Path teachersPath, ParsingService parser, ValidatorService<Teacher> validator) {
-        super(parser, validator);
-        teachers = initEntities(teachersPath);
+    public TeacherService(List<Teacher> teachers, ValidatorService<Teacher> validator) {
+        super(teachers, validator);
     }
 
-    public boolean addTeacher(String jsonBody) {
-        Teacher teacher = parser.parse(jsonBody, new TypeReference<>() {
-        });
-        synchronized (teachers) {
+    public boolean addTeacher(Teacher teacher) {
+        synchronized (entities) {
             if (validateEntity(teacher, Objects::nonNull, this::isUnique, validator::validate)) {
-                teachers.add(teacher);
+                entities.add(teacher);
                 return true;
             } else {
                 return false;
@@ -35,36 +27,23 @@ public class TeacherService extends EntityService<Teacher> {
     }
 
     public Teacher getTeacher(int id) {
-        synchronized (teachers) {
-            return teachers.stream()
+        synchronized (entities) {
+            return entities.stream()
                     .filter(t -> t.getId() == id)
                     .findFirst()
                     .orElse(null);
         }
     }
 
-    public List<Subject> updateTeacherSubjects(String[] subjects, int id) {
-        List<Subject> updatedSubjects = Arrays.stream(subjects)
-                .map(Subject::getSubject)
-                .collect(Collectors.toList());
+    public List<Subject> updateTeacherSubjects(List<Subject> subjects, int id) {
         Teacher teacher = getTeacher(id);
-        synchronized (teachers) {
-            if (!updatedSubjects.isEmpty()) {
-                teacher.setSubjects(updatedSubjects);
+        synchronized (entities) {
+            if (!subjects.isEmpty()) {
+                teacher.setSubjects(subjects);
                 return teacher.getSubjects();
             } else {
                 return null;
             }
         }
-    }
-
-    @Override
-    protected List<Teacher> initEntities(Path path) {
-        return parser.parseList(path, Teacher.class);
-    }
-
-    @Override
-    protected boolean isUnique(Teacher entity) {
-        return !teachers.contains(entity);
     }
 }

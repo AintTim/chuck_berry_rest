@@ -1,10 +1,8 @@
 package com.ainetdinov.rest.service;
 
 import com.ainetdinov.rest.model.Student;
-import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.Getter;
 
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
@@ -12,33 +10,31 @@ import java.util.stream.Collectors;
 
 @Getter
 public class StudentService extends EntityService<Student> {
-    private final List<Student> students;
 
-    public StudentService(Path studentsPath, ParsingService parser, ValidatorService<Student> validator) {
-        super(parser, validator);
-        students = initEntities(studentsPath);
+    public StudentService(List<Student> students, ValidatorService<Student> validator) {
+        super(students, validator);
     }
 
     public Student getStudent(int id) {
-        return students.stream()
+        return entities.stream()
                 .filter(student -> student.getId() == id)
                 .findFirst()
                 .orElse(null);
     }
 
     public List<Student> getStudents(Predicate<Student> filter) {
-        return students.stream()
+        return entities.stream()
                 .filter(filter)
                 .collect(Collectors.toList());
     }
 
-    public Student updateStudent(String jsonBody, int id) {
-        Student updatedStudent = parser.parse(jsonBody, new TypeReference<>(){});
+    public Student updateStudent(Student updatedStudent, int id) {
+//        Student updatedStudent = parser.parse(jsonBody, new TypeReference<>(){});
         Student currentStudent = getStudent(id);
-        synchronized (students) {
+        synchronized (entities) {
             if (validateEntity(updatedStudent, Objects::nonNull, validator::validate) && validateEntity(currentStudent, Objects::nonNull)) {
                 updatedStudent.setId((long) id);
-                students.set(students.indexOf(currentStudent), updatedStudent);
+                entities.set(entities.indexOf(currentStudent), updatedStudent);
                 return updatedStudent;
             } else {
                 return null;
@@ -46,11 +42,10 @@ public class StudentService extends EntityService<Student> {
         }
     }
 
-    public boolean addStudent(String jsonBody) {
-        Student student = parser.parse(jsonBody, new TypeReference<>(){});
-        synchronized (students) {
+    public boolean addStudent(Student student) {
+        synchronized (entities) {
             if (validateEntity(student, Objects::nonNull, this::isUnique, validator::validate)) {
-                students.add(student);
+                entities.add(student);
                 return true;
             } else {
                 return false;
@@ -59,18 +54,8 @@ public class StudentService extends EntityService<Student> {
     }
 
     public boolean deleteStudent(int id) {
-        synchronized (students) {
-            return students.removeIf(student -> student.getId() == id);
+        synchronized (entities) {
+            return entities.removeIf(student -> student.getId() == id);
         }
-    }
-
-    @Override
-    protected List<Student> initEntities(Path path) {
-        return parser.parseList(path, Student.class);
-    }
-
-    @Override
-    protected boolean isUnique(Student entity) {
-        return !students.contains(entity);
     }
 }

@@ -2,8 +2,11 @@ package com.ainetdinov.rest.servlet;
 
 import com.ainetdinov.rest.constant.WebConstants;
 import com.ainetdinov.rest.model.Group;
+import com.ainetdinov.rest.model.Student;
 import com.ainetdinov.rest.service.GroupsService;
 import com.ainetdinov.rest.service.HttpService;
+import com.ainetdinov.rest.service.ParsingService;
+import com.fasterxml.jackson.core.type.TypeReference;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.annotation.WebServlet;
@@ -22,12 +25,14 @@ import static com.ainetdinov.rest.constant.Endpoint.*;
 public class GroupServlet extends HttpServlet {
     private GroupsService groupsService;
     private HttpService httpService;
+    private ParsingService parsingService;
 
     @Override
     public void init(ServletConfig config) {
         ServletContext context = config.getServletContext();
         groupsService = (GroupsService) context.getAttribute(WebConstants.GROUP_SERVICE);
         httpService = (HttpService) context.getAttribute(WebConstants.HTTP_SERVICE);
+        parsingService = (ParsingService) context.getAttribute(WebConstants.PARSER_SERVICE);
     }
 
     @Override
@@ -40,19 +45,18 @@ public class GroupServlet extends HttpServlet {
                 getGroupsByStudentSurname(req, resp);
             }
         } else {
-            resp.getWriter().write(groupsService.getGroups().toString());
+            resp.getWriter().write(groupsService.getEntities().toString());
             resp.setStatus(HttpServletResponse.SC_OK);
         }
     }
 
     @Override
-    public void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    public void doPost(HttpServletRequest req, HttpServletResponse resp) {
         httpService.prepareResponse(resp);
-        String body = httpService.getRequestBody(req);
         if (httpService.containsPath(req)) {
-            groupsService.addStudentsToGroup(body, httpService.extractId(req));
+            groupsService.addStudentsToGroup(parseStudents(req), httpService.extractId(req));
             resp.setStatus(HttpServletResponse.SC_CREATED);
-        } else if (groupsService.addGroup(body)) {
+        } else if (groupsService.addGroup(parseGroup(req))) {
             resp.setStatus(HttpServletResponse.SC_CREATED);
         } else {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -80,6 +84,23 @@ public class GroupServlet extends HttpServlet {
         } else {
             resp.getWriter().write(groups.toString());
             resp.setStatus(HttpServletResponse.SC_OK);
+        }
+    }
+
+    private Group parseGroup(HttpServletRequest request) {
+        try {
+            return parsingService.parse(httpService.getRequestBody(request), new TypeReference<>(){});
+        } catch (IOException e) {
+            return null;
+            //logs
+        }
+    }
+
+    private List<Student> parseStudents(HttpServletRequest request) {
+        try {
+            return parsingService.parse(httpService.getRequestBody(request), new TypeReference<>(){});
+        } catch (IOException e) {
+            return null;
         }
     }
 }
