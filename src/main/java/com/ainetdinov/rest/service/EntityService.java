@@ -5,6 +5,7 @@ import lombok.Getter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Getter
 public abstract class EntityService<T> {
@@ -16,8 +17,16 @@ public abstract class EntityService<T> {
         this.validator = validator;
     }
 
-    protected boolean isUnique(T entity) {
+    public boolean isUnique(T entity) {
         return !entities.contains(entity);
+    }
+
+    public List<T> getEntities(Predicate<T> filter) {
+        return entities.stream().filter(filter).collect(Collectors.toList());
+    }
+
+    public T getEntity(Predicate<T> filter) {
+        return entities.stream().filter(filter).findFirst().orElse(null);
     }
 
     @SafeVarargs

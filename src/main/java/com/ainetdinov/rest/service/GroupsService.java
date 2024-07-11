@@ -6,9 +6,6 @@ import lombok.Getter;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 @Getter
 public class GroupsService extends EntityService<Group> {
@@ -32,15 +29,9 @@ public class GroupsService extends EntityService<Group> {
         return super.getEntities();
     }
 
-    public List<Group> getGroups(Predicate<Group> filter) {
-        return entities.stream()
-                .filter(filter)
-                .collect(Collectors.toList());
-    }
-
     public boolean addGroup(Group group) {
         synchronized (entities) {
-            if (validateEntity(group, Objects::nonNull, this::isUnique, validator::validate) && validateStudentsPresence(group.getStudents())) {
+            if (validateEntity(group, validator::validate, this::isUnique) && validateStudentsPresence(group.getStudents())) {
                 entities.add(group);
                 return true;
             } else {
@@ -50,7 +41,7 @@ public class GroupsService extends EntityService<Group> {
     }
 
     public void addStudentsToGroup(List<Student> students, int groupId) {
-        Group group = getGroupById(groupId);
+        Group group = getEntity(g -> g.getId() == groupId);
         synchronized (entities) {
             if (validateStudentsPresence(students)) {
                 students.stream()
@@ -59,14 +50,6 @@ public class GroupsService extends EntityService<Group> {
             }
         }
     }
-
-    public Group getGroupById(int groupId) {
-        return entities.stream()
-                .filter(group -> group.getId() == groupId)
-                .findFirst()
-                .orElse(null);
-    }
-
 
     private boolean isUniqueStudent(Student student, Group group) {
         return !group.getStudents().contains(student);

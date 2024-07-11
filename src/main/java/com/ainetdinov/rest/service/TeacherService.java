@@ -17,7 +17,7 @@ public class TeacherService extends EntityService<Teacher> {
 
     public boolean addTeacher(Teacher teacher) {
         synchronized (entities) {
-            if (validateEntity(teacher, Objects::nonNull, this::isUnique, validator::validate)) {
+            if (validateEntity(teacher, validator::validate, this::isUnique)) {
                 entities.add(teacher);
                 return true;
             } else {
@@ -26,17 +26,8 @@ public class TeacherService extends EntityService<Teacher> {
         }
     }
 
-    public Teacher getTeacher(int id) {
-        synchronized (entities) {
-            return entities.stream()
-                    .filter(t -> t.getId() == id)
-                    .findFirst()
-                    .orElse(null);
-        }
-    }
-
     public List<Subject> updateTeacherSubjects(List<Subject> subjects, int id) {
-        Teacher teacher = getTeacher(id);
+        Teacher teacher = getEntity(t -> t.getId() == id);
         synchronized (entities) {
             if (!subjects.isEmpty() && Objects.nonNull(teacher)) {
                 teacher.setSubjects(subjects);

@@ -9,7 +9,6 @@ import com.ainetdinov.rest.service.ParsingService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletContext;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -66,13 +65,13 @@ public class GroupServlet extends HttpServlet {
         httpService.prepareResponse(resp);
         int groupId = httpService.extractId(req);
         groupsService.addStudentsToGroup(parseStudents(req), groupId);
-        resp.getWriter().write(groupsService.getGroupById(groupId).toString());
+        resp.getWriter().write(groupsService.getEntity(g -> g.getId() == groupId).toString());
         resp.setStatus(HttpServletResponse.SC_OK);
     }
 
     private void getGroupByNumber(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String number = req.getParameter(WebConstants.NUMBER);
-        List<Group> groups = groupsService.getGroups(g -> g.getNumber().equals(number));
+        List<Group> groups = groupsService.getEntities(g -> g.getNumber().equals(number));
         if (groups.isEmpty()) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
         } else {
@@ -85,7 +84,7 @@ public class GroupServlet extends HttpServlet {
         String studentSurname = req.getParameter(WebConstants.SURNAME);
         Predicate<Group> isStudentPresent = g -> g.getStudents().stream()
                 .anyMatch(student -> student.getSurname().equalsIgnoreCase(studentSurname));
-        List<Group> groups = groupsService.getGroups(isStudentPresent);
+        List<Group> groups = groupsService.getEntities(isStudentPresent);
         if (groups.isEmpty()) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
         } else {

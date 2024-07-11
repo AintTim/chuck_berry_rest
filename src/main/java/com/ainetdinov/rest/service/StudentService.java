@@ -31,7 +31,7 @@ public class StudentService extends EntityService<Student> {
     public Student updateStudent(Student updatedStudent, int id) {
         Student currentStudent = getStudent(id);
         synchronized (entities) {
-            if (validateEntity(updatedStudent, Objects::nonNull, validator::validate) && validateEntity(currentStudent, Objects::nonNull)) {
+            if (validateEntity(updatedStudent, validator::validate) && validateEntity(currentStudent, Objects::nonNull)) {
                 updatedStudent.setId((long) id);
                 entities.set(entities.indexOf(currentStudent), updatedStudent);
                 return updatedStudent;
@@ -43,7 +43,7 @@ public class StudentService extends EntityService<Student> {
 
     public boolean addStudent(Student student) {
         synchronized (entities) {
-            if (validateEntity(student, Objects::nonNull, this::isUnique, validator::validate)) {
+            if (validateEntity(student, validator::validate, this::isUnique)) {
                 entities.add(student);
                 return true;
             } else {

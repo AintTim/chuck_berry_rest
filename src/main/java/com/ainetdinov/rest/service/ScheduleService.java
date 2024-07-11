@@ -4,6 +4,8 @@ import com.ainetdinov.rest.model.Schedule;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Getter
 public class ScheduleService extends EntityService<Schedule> {
@@ -16,4 +18,7 @@ public class ScheduleService extends EntityService<Schedule> {
         this.groupsService = groupsService;
     }
 
+    public List<Schedule> getSchedules(Predicate<Schedule> filter) {
+        return entities.stream().filter(filter).collect(Collectors.toList());
+    }
 }
