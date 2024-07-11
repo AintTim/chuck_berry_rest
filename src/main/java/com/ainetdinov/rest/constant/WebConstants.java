@@ -12,6 +12,8 @@ public class WebConstants {
     public static final String SURNAME = "surname";
     public static final String SUBJECTS = "subjects";
     public static final String GROUP_NUMBER = "groupNumber";
+    public static final String STUDENT_NAME = "studentName";
+    public static final String TEACHER_NAME = "teacherName";
     public static final String STUDENT_SURNAME = "studentSurname";
 
     public static String STUDENTS_PATH = "students.path";

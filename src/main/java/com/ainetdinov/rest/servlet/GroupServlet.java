@@ -71,11 +71,11 @@ public class GroupServlet extends HttpServlet {
 
     private void getGroupByNumber(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String number = req.getParameter(WebConstants.NUMBER);
-        List<Group> groups = groupsService.getEntities(g -> g.getNumber().equals(number));
-        if (groups.isEmpty()) {
+        Group group = groupsService.getEntity(g -> g.getNumber().equals(number));
+        if (Objects.isNull(group)) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
         } else {
-            resp.getWriter().write(groups.toString());
+            resp.getWriter().write(group.toString());
             resp.setStatus(HttpServletResponse.SC_OK);
         }
     }

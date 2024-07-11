@@ -6,6 +6,7 @@ import lombok.Getter;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.function.Predicate;
 
 @Getter
 public class GroupsService extends EntityService<Group> {
@@ -21,7 +22,7 @@ public class GroupsService extends EntityService<Group> {
         //TODO: Добавить обработку обновленных студентов
         synchronized (this) {
             entities.forEach(group -> {
-                if (!validateStudentsPresence(group.getStudents())) {
+                if (!validateStudents(group.getStudents(), true)) {
                     group.getStudents().removeIf(student -> !studentService.getEntities().contains(student));
                 }
             });
@@ -31,7 +32,8 @@ public class GroupsService extends EntityService<Group> {
 
     public boolean addGroup(Group group) {
         synchronized (entities) {
-            if (validateEntity(group, validator::validate, this::isUnique) && validateStudentsPresence(group.getStudents())) {
+            if (validateEntity(group, validator::validate, this::isUnique)
+                    && validateStudents(group.getStudents(), false)) {
                 entities.add(group);
                 return true;
             } else {
@@ -43,19 +45,30 @@ public class GroupsService extends EntityService<Group> {
     public void addStudentsToGroup(List<Student> students, int groupId) {
         Group group = getEntity(g -> g.getId() == groupId);
         synchronized (entities) {
-            if (validateStudentsPresence(students)) {
-                students.stream()
-                        .filter(s -> isUniqueStudent(s, group))
-                        .forEach(group.getStudents()::add);
+            if (validateStudents(students, false)) {
+                group.getStudents().addAll(students);
             }
         }
     }
 
-    private boolean isUniqueStudent(Student student, Group group) {
-        return !group.getStudents().contains(student);
+    public Group getGroupByStudentNameAndSurname(String name, String surname) {
+        synchronized (entities) {
+            Predicate<Group> isFound = group -> group.getStudents()
+                    .stream()
+                    .anyMatch(student -> student.getSurname().equals(surname) && student.getName().equals(name));
+            return getEntity(isFound);
+        }
     }
 
-    private boolean validateStudentsPresence(List<Student> students) {
-        return new HashSet<>(studentService.getEntities()).containsAll(students);
+    private boolean validateStudents(List<Student> students, boolean currentStudents) {
+        boolean isPresent = new HashSet<>(studentService.getEntities()).containsAll(students);
+        if (currentStudents) {
+            return isPresent;
+        } else {
+            boolean isRelatedToGroup = entities.stream()
+                    .flatMap(g -> g.getStudents().stream())
+                    .anyMatch(students::contains);
+            return isPresent && !isRelatedToGroup;
+        }
     }
 }
