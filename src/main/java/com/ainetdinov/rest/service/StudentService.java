@@ -29,7 +29,6 @@ public class StudentService extends EntityService<Student> {
     }
 
     public Student updateStudent(Student updatedStudent, int id) {
-//        Student updatedStudent = parser.parse(jsonBody, new TypeReference<>(){});
         Student currentStudent = getStudent(id);
         synchronized (entities) {
             if (validateEntity(updatedStudent, Objects::nonNull, validator::validate) && validateEntity(currentStudent, Objects::nonNull)) {

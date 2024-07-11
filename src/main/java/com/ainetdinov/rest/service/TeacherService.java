@@ -38,7 +38,7 @@ public class TeacherService extends EntityService<Teacher> {
     public List<Subject> updateTeacherSubjects(List<Subject> subjects, int id) {
         Teacher teacher = getTeacher(id);
         synchronized (entities) {
-            if (!subjects.isEmpty()) {
+            if (!subjects.isEmpty() && Objects.nonNull(teacher)) {
                 teacher.setSubjects(subjects);
                 return teacher.getSubjects();
             } else {

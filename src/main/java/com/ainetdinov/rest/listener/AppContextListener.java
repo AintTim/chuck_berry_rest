@@ -37,7 +37,7 @@ public class AppContextListener implements ServletContextListener {
         StudentService studentService = new StudentService(initEntities(WebConstants.STUDENTS_PATH, Student.class), new StudentValidator());
         TeacherService teacherService = new TeacherService(initEntities(WebConstants.TEACHERS_PATH, Teacher.class), new TeacherValidator());
         GroupsService groupsService = new GroupsService(initEntities(WebConstants.GROUPS_PATH, Group.class), new GroupValidator(), studentService);
-        ScheduleService scheduleService = new ScheduleService(initEntities(WebConstants.SCHEDULE_SERVICE, Schedule.class), new ScheduleValidator(), teacherService, groupsService);
+        ScheduleService scheduleService = new ScheduleService(initEntities(WebConstants.SCHEDULES_PATH, Schedule.class), new ScheduleValidator(), teacherService, groupsService);
 
         context.setAttribute(WebConstants.PARSER_SERVICE, parsingService);
         context.setAttribute(WebConstants.STUDENT_SERVICE, studentService);

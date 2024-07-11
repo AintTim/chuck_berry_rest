@@ -19,6 +19,19 @@ public class GroupsService extends EntityService<Group> {
         this.studentService = studentService;
     }
 
+    @Override
+    public List<Group> getEntities() {
+        //TODO: Добавить обработку обновленных студентов
+        synchronized (this) {
+            entities.forEach(group -> {
+                if (!validateStudentsPresence(group.getStudents())) {
+                    group.getStudents().removeIf(student -> !studentService.getEntities().contains(student));
+                }
+            });
+        }
+        return super.getEntities();
+    }
+
     public List<Group> getGroups(Predicate<Group> filter) {
         return entities.stream()
                 .filter(filter)

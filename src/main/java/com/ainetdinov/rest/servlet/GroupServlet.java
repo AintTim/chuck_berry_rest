@@ -9,6 +9,7 @@ import com.ainetdinov.rest.service.ParsingService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -53,14 +54,20 @@ public class GroupServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest req, HttpServletResponse resp) {
         httpService.prepareResponse(resp);
-        if (httpService.containsPath(req)) {
-            groupsService.addStudentsToGroup(parseStudents(req), httpService.extractId(req));
-            resp.setStatus(HttpServletResponse.SC_CREATED);
-        } else if (groupsService.addGroup(parseGroup(req))) {
+        if (groupsService.addGroup(parseGroup(req))) {
             resp.setStatus(HttpServletResponse.SC_CREATED);
         } else {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
+    }
+
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        httpService.prepareResponse(resp);
+        int groupId = httpService.extractId(req);
+        groupsService.addStudentsToGroup(parseStudents(req), groupId);
+        resp.getWriter().write(groupsService.getGroupById(groupId).toString());
+        resp.setStatus(HttpServletResponse.SC_OK);
     }
 
     private void getGroupByNumber(HttpServletRequest req, HttpServletResponse resp) throws IOException {
