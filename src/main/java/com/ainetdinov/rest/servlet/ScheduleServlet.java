@@ -8,8 +8,10 @@ import com.ainetdinov.rest.model.Teacher;
 import com.ainetdinov.rest.service.HttpService;
 import com.ainetdinov.rest.service.ParsingService;
 import com.ainetdinov.rest.service.ScheduleService;
+import com.fasterxml.jackson.core.type.TypeReference;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,6 +19,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -47,13 +50,31 @@ public class ScheduleServlet extends HttpServlet {
                schedules = getSchedulesByStudent(req);
             } else if (Objects.nonNull(req.getParameter(WebConstants.GROUP_NUMBER))) {
                 schedules = getSchedulesByGroup(req);
-            } else {
+            } else if (Objects.nonNull(req.getParameter(WebConstants.TEACHER_NAME))){
                 schedules = getSchedulesByTeacher(req);
+            } else {
+                schedules = getSchedulesByDate(req);
             }
         } else {
             schedules = scheduleService.getEntities();
         }
-        sendResponse(req, resp, schedules);
+        sendResponse(resp, schedules);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
+        httpService.prepareResponse(resp);
+        if (scheduleService.addSchedule(parseSchedule(req))) {
+            resp.setStatus(HttpServletResponse.SC_CREATED);
+        } else {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        }
+    }
+
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        httpService.prepareResponse(resp);
+
     }
 
     private List<Schedule> getSchedulesBy(Object object, ScheduleQuery model) {
@@ -69,13 +90,19 @@ public class ScheduleServlet extends HttpServlet {
         return schedules;
     }
 
-    private void sendResponse(HttpServletRequest req, HttpServletResponse resp, List<Schedule> schedules) throws IOException {
+    private void sendResponse(HttpServletResponse resp, List<Schedule> schedules) throws IOException {
         if (schedules.isEmpty()) {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
         } else {
             resp.getWriter().write(schedules.toString());
             resp.setStatus(HttpServletResponse.SC_OK);
         }
+    }
+
+    private List<Schedule> getSchedulesByDate(HttpServletRequest req) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        LocalDate date = LocalDate.parse(req.getParameter(WebConstants.SCHEDULE_DATE), formatter);
+        return getSchedulesBy(date, ScheduleQuery.SCHEDULE);
     }
 
     private List<Schedule> getSchedulesByStudent(HttpServletRequest req) {
@@ -95,5 +122,13 @@ public class ScheduleServlet extends HttpServlet {
         String teacherName = req.getParameter(WebConstants.TEACHER_NAME);
         Teacher teacher = scheduleService.getTeacherService().getEntity(t -> t.getName().equals(teacherName));
         return getSchedulesBy(teacher, ScheduleQuery.TEACHER);
+    }
+
+    private Schedule parseSchedule(HttpServletRequest request) {
+        try {
+            return parsingService.parse(httpService.getRequestBody(request), new TypeReference<>(){});
+        } catch (IOException e) {
+            return null;
+        }
     }
 }

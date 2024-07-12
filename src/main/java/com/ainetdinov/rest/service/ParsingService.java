@@ -45,7 +45,8 @@ public class ParsingService {
             if (isValidJson(jsonBody)) {
                 return mapper.readValue(jsonBody, typeReference);
             } else {
-                throw new IllegalArgumentException(String.format("Invalid json body: %s", jsonBody));
+                return null;
+//                throw new IllegalArgumentException(String.format("Invalid json body: %s", jsonBody));
             }
         } catch (IOException e) {
             return null;

@@ -18,8 +18,8 @@ ext {
     apacheVersion = '3.14.0'
 }
 
-sourceCompatibility = '11'
-targetCompatibility = '11'
+sourceCompatibility = '17'
+targetCompatibility = '17'
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'

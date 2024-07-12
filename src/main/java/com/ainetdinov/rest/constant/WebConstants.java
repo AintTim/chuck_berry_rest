@@ -15,6 +15,7 @@ public class WebConstants {
     public static final String STUDENT_NAME = "studentName";
     public static final String TEACHER_NAME = "teacherName";
     public static final String STUDENT_SURNAME = "studentSurname";
+    public static final String SCHEDULE_DATE = "date";
 
     public static String STUDENTS_PATH = "students.path";
     public static String TEACHERS_PATH = "teachers.path";
