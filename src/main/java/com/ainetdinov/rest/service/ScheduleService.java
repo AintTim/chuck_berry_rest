@@ -25,6 +25,22 @@ public class ScheduleService extends EntityService<Schedule> {
         return entities.stream().filter(filter).collect(Collectors.toList());
     }
 
+    public Schedule updateSchedule(Schedule current, Schedule updated) {
+        synchronized (entities) {
+            if (validateScheduleUpdate(current, updated)) {
+                entities.set(entities.indexOf(current), updated);
+                return updated;
+            } else {
+                return null;
+            }
+        }
+    }
+
+    private boolean validateScheduleUpdate(Schedule current, Schedule updated) {
+        return validateEntity(current, validator::validate, entities::contains, this::validateTeacherAndGroupPresence)
+                && validateEntity(updated, validator::validate, this::isUnique, this::validateTeacherAndGroupPresence);
+    }
+
     public boolean addSchedule(Schedule schedule) {
         synchronized (this) {
             if (validateEntity(schedule, validator::validate, this::isUnique, this::validateTeacherAndGroupPresence)) {

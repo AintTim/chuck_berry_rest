@@ -4,6 +4,7 @@ import com.ainetdinov.rest.constant.ScheduleQuery;
 import com.ainetdinov.rest.constant.WebConstants;
 import com.ainetdinov.rest.model.Group;
 import com.ainetdinov.rest.model.Schedule;
+import com.ainetdinov.rest.model.ScheduleDTO;
 import com.ainetdinov.rest.model.Teacher;
 import com.ainetdinov.rest.service.HttpService;
 import com.ainetdinov.rest.service.ParsingService;
@@ -11,7 +12,6 @@ import com.ainetdinov.rest.service.ScheduleService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletContext;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -72,9 +72,20 @@ public class ScheduleServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         httpService.prepareResponse(resp);
-
+        ScheduleDTO scheduleDTO = parsingService.parse(httpService.getRequestBody(req), new TypeReference<>() {});
+        if (Objects.nonNull(scheduleDTO)) {
+            Schedule updatedSchedule = scheduleService.updateSchedule(scheduleDTO.getCurrent(), scheduleDTO.getUpdated());
+            if (Objects.nonNull(updatedSchedule)) {
+                resp.getWriter().write(updatedSchedule.toString());
+                resp.setStatus(HttpServletResponse.SC_OK);
+            } else {
+                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            }
+        } else {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        }
     }
 
     private List<Schedule> getSchedulesBy(Object object, ScheduleQuery model) {

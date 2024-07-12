@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 @Jacksonized
 @EqualsAndHashCode
 public class Schedule {
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime start;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")

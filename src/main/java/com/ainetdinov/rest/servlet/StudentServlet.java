@@ -79,8 +79,10 @@ public class StudentServlet extends HttpServlet {
                 resp.getWriter().write(updatesStudent.toString());
                 resp.setStatus(HttpServletResponse.SC_OK);
             } else {
-                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
             }
+        } else {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
     }
 
