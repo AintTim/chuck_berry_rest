@@ -1,0 +1,96 @@
+[
+  {
+    "id": 1,
+    "number": "1337",
+    "students": [
+      {
+        "id": 1,
+        "name": "John",
+        "surname": "Doe",
+        "birthDate": "1995-02-13",
+        "phoneNumber": "+7 999 888-77-66"
+      },
+      {
+        "id": 3,
+        "name": "Rocco",
+        "surname": "Wilson",
+        "birthDate": "1990-08-14",
+        "phoneNumber": "+7 921 875-78-48"
+      },
+      {
+        "id": 7,
+        "name": "Lisa",
+        "surname": "Phillips",
+        "birthDate": "2002-12-27",
+        "phoneNumber": "+375 55 513-49-92"
+      },
+      {
+        "id": 10,
+        "name": "Dale",
+        "surname": "May",
+        "birthDate": "2007-07-07",
+        "phoneNumber": "+7 777 777-77-77"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "number": "404",
+    "students": [
+      {
+        "id": 2,
+        "name": "Jane",
+        "surname": "Doe",
+        "birthDate": "1997-08-26",
+        "phoneNumber": "+7 900 800-70-60"
+      },
+      {
+        "id": 4,
+        "name": "Christine",
+        "surname": "Franco",
+        "birthDate": "1987-08-10",
+        "phoneNumber": "+375 47 686-78-48"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "number": "166",
+    "students": [
+      {
+        "id": 5,
+        "name": "Grace",
+        "surname": "Conner",
+        "birthDate": "1995-05-05",
+        "phoneNumber": "+7 990 013-74-49"
+      },
+      {
+        "id": 6,
+        "name": "Paul",
+        "surname": "Terry",
+        "birthDate": "1990-11-15",
+        "phoneNumber": "+7 842 020-98-45"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "number": "200",
+    "students": [
+      {
+        "id": 8,
+        "name": "Bella",
+        "surname": "Murray",
+        "birthDate": "1999-11-15",
+        "phoneNumber": "+7 861 417-34-99"
+      },
+      {
+        "id": 9,
+        "name": "Cole",
+        "surname": "Montes",
+        "birthDate": "1978-07-04",
+        "phoneNumber": "+7 909 192-21-57"
+      }
+    ]
+  }
+]
